@@ -25,22 +25,20 @@ import (
 
 func main() {
 	var seed [32]byte
-	_, err := rand.Read(seed[:])
-	if err != nil {
-		panic(err)
-	}
+	rand.Read(seed[:])
 
-	keychain := wots.NewKeychain(seed)
+	keychain, _ := NewKeychain(seed)
 	keypair := keychain.Next()
 
 	fmt.Printf("Public Key: %x\n", keypair.PublicKey)
 	fmt.Printf("Private Key: %x\n", keypair.PrivateKey)
 
 	var message [32]byte
+	copy(message[:], []byte("Hello, world!"))
 	// Initialize message with some value
 	signature := keypair.Sign(message)
 
-	fmt.Printf("Signature: %x\n", signature)
+	fmt.Println("Signature: ", len(signature))
 
 	isValid := keypair.Verify(message, signature)
 	fmt.Printf("Signature valid: %v\n", isValid)
@@ -49,6 +47,7 @@ func main() {
 	signature[0] ^= 0xFF
 	isValid = keypair.Verify(message, signature)
 	fmt.Printf("Signature valid after tampering: %v\n", isValid)
+
 }
 ```
 

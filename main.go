@@ -102,7 +102,7 @@ func Keygen(private_key ...[32]byte) (Keypair, error) {
  */
 func (keypair *Keypair) Sign(message [32]byte) [2144]byte {
 	var sig [2144]byte
-	sig = wotsSign(message, keypair.PrivateKey, keypair.Components.PublicSeed, keypair.Components.AddrSeed)
+	sig = wotsSign(message, keypair.Components.PrivateSeed, keypair.Components.PublicSeed, keypair.Components.AddrSeed)
 	return sig
 }
 
@@ -118,14 +118,7 @@ func (keypair *Keypair) Sign(message [32]byte) [2144]byte {
  */
 func (keypair *Keypair) Verify(message [32]byte, signature [2144]byte) bool {
 	pk := wotsPkFromSig(signature, message, keypair.Components.PublicSeed, keypair.Components.AddrSeed)
-	//return pk == keypair.PublicKey
-	// compare the two arrays
-	for i := 0; i < len(pk); i++ {
-		if pk[i] != keypair.PublicKey[i] {
-			return false
-		}
-	}
-	return true
+	return pk == keypair.PublicKey
 }
 
 func newKeychainFromSeed(seed [32]byte) Keychain {
@@ -165,7 +158,8 @@ func NewKeychain(seed ...[32]byte) (Keychain, error) {
  * - Keypair: the next keypair in the sequence, incrementing the internal index
  */
 func (keychain *Keychain) Next() Keypair {
-	private_key := mochimoHash([]byte(string(keychain.Seed[:]) + strconv.FormatUint(keychain.Index, 10)))
+	data := append(keychain.Seed[:], []byte(strconv.FormatUint(keychain.Index, 10))...)
+	private_key := mochimoHash(data)
 	keypair, _ := Keygen(private_key)
 	keychain.Index++
 	return keypair
