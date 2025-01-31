@@ -1,6 +1,6 @@
 # WOTS-Go
 
-A Go implementation of the Winternitz One-Time Signature (WOTS) scheme.
+A Go wrapper of the Winternitz One-Time Signature (WOTS) scheme of the Mochimo cryptocurrency.
 
 ## Installation
 
