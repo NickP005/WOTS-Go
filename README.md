@@ -10,11 +10,9 @@ To install the package, run:
 go get github.com/NickP005/WOTS-Go
 ```
 
-## Usage
+## Usage Example
 
-### Key Generation
-
-There are two ways to generate a new keypair:
+Here's a complete example showing all features with detailed explanations:
 
 ```go
 package main
@@ -37,59 +35,20 @@ func main() {
 
 	fmt.Printf("Public Key: %x\n", keypair.PublicKey)
 	fmt.Printf("Private Key: %x\n", keypair.PrivateKey)
-}
-```
-
-### Signing a Message
-
-To sign a message:
-
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/NickP005/WOTS-Go"
-)
-
-func main() {
-	var seed [32]byte
-	// Initialize seed with some value
-	keychain := wots.NewKeychain(seed)
-	keypair := keychain.Next()
 
 	var message [32]byte
 	// Initialize message with some value
 	signature := keypair.Sign(message)
 
 	fmt.Printf("Signature: %x\n", signature)
-}
-```
-
-### Verifying a Signature
-
-To verify a signature:
-
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/NickP005/WOTS-Go"
-)
-
-func main() {
-	var seed [32]byte
-	// Initialize seed with some value
-	keychain := wots.NewKeychain(seed)
-	keypair := keychain.Next()
-
-	var message [32]byte
-	// Initialize message with some value
-	signature := keypair.Sign(message)
 
 	isValid := keypair.Verify(message, signature)
 	fmt.Printf("Signature valid: %v\n", isValid)
+
+	// Tampering with the signature
+	signature[0] ^= 0xFF
+	isValid = keypair.Verify(message, signature)
+	fmt.Printf("Signature valid after tampering: %v\n", isValid)
 }
 ```
 
