@@ -118,7 +118,14 @@ func (keypair *Keypair) Sign(message [32]byte) [2144]byte {
  */
 func (keypair *Keypair) Verify(message [32]byte, signature [2144]byte) bool {
 	pk := wotsPkFromSig(signature, message, keypair.Components.PublicSeed, keypair.Components.AddrSeed)
-	return pk == keypair.PublicKey
+	//return pk == keypair.PublicKey
+	// compare the two arrays
+	for i := 0; i < len(pk); i++ {
+		if pk[i] != keypair.PublicKey[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func newKeychainFromSeed(seed [32]byte) Keychain {
