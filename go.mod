@@ -1,3 +1,3 @@
-module github.com/NickP005/Vindax-MCM-tools/tool-2
+module github.com/NickP005/WOTS-Go
 
 go 1.23.5
