@@ -1,4 +1,4 @@
-package main
+package wots
 
 import (
 	"crypto/rand"
@@ -189,8 +189,4 @@ func DeriveSeed(deterministicSeed []byte, id uint64) ([]byte, *DigestRandomGener
 	secret := prng.NextBytes(32)
 
 	return secret, prng
-}
-
-func main() {
-
 }
