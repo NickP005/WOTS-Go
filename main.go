@@ -1,10 +1,11 @@
-package wots
+package main
 
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/binary"
 	"errors"
-	"strconv"
 )
 
 type Keychain struct {
@@ -158,9 +159,38 @@ func NewKeychain(seed ...[32]byte) (Keychain, error) {
  * - Keypair: the next keypair in the sequence, incrementing the internal index
  */
 func (keychain *Keychain) Next() Keypair {
-	data := append(keychain.Seed[:], []byte(strconv.FormatUint(keychain.Index, 10))...)
-	private_key := mochimoHash(data)
-	keypair, _ := Keygen(private_key)
+	secret, _ := DeriveSeed(keychain.Seed[:], keychain.Index)
+	var privateKey [32]byte
+	copy(privateKey[:], secret)
+
+	keypair, _ := Keygen(privateKey)
 	keychain.Index++
 	return keypair
+}
+
+func DeriveSeed(deterministicSeed []byte, id uint64) ([]byte, *DigestRandomGenerator) {
+	// Convert id to bytes
+	idBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(idBytes, id)
+
+	// Combine seed and id
+	input := append(deterministicSeed, idBytes...)
+
+	// Create SHA-512 hash
+	h := sha512.New()
+	h.Write(input)
+	localSeed := h.Sum(nil)
+
+	// Initialize PRNG
+	prng := NewDigestRandomGenerator()
+	prng.AddSeedMaterial(localSeed)
+
+	// Generate secret (first 32 bytes)
+	secret := prng.NextBytes(32)
+
+	return secret, prng
+}
+
+func main() {
+
 }

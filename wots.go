@@ -1,4 +1,4 @@
-package wots
+package main
 
 /*
 #cgo CFLAGS: -I${SRCDIR}
